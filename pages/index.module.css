@@ -41,7 +41,7 @@
   flex-direction: column;
   width: 320px;
 }
-.main input[type="text"] {
+.main button, .main input[type="text"] {
   padding: 12px 16px;
   border: 1px solid #10a37f;
   border-radius: 4px;
@@ -52,7 +52,7 @@
   color: #8e8ea0;
   opacity: 1;
 }
-.main input[type="submit"] {
+.main button, .main input[type="submit"] {
   padding: 12px 0;
   color: #fff;
   background-color: #10a37f;
@@ -60,6 +60,11 @@
   border-radius: 4px;
   text-align: center;
   cursor: pointer;
+}
+.main button {
+  margin-left: 25%;
+  margin-right: 25%;
+  background-color: #10a399;
 }
 .main .result {
   font-weight: bold;
