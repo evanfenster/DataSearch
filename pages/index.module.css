@@ -43,10 +43,10 @@
 }
 .main button, .main input[type="text"] {
   padding: 12px 16px;
-  border: 1px solid #10a37f;
+  border: 1px solid #9fd1f7;
   border-radius: 4px;
   margin-bottom: 24px;
-  outline-color: #10a37f;
+  outline-color: #9fd1f7;
 }
 .main ::placeholder {
   color: #8e8ea0;
@@ -54,8 +54,8 @@
 }
 .main button, .main input[type="submit"] {
   padding: 12px 0;
-  color: #fff;
-  background-color: #10a37f;
+  color: rgb(0, 0, 0);
+  background-color: #9fd1f7;
   border: none;
   border-radius: 4px;
   text-align: center;
@@ -64,9 +64,11 @@
 .main button {
   margin-left: 25%;
   margin-right: 25%;
-  background-color: #10a399;
+  background-color: #e6eff8;
 }
 .main .result {
   font-weight: bold;
   margin-top: 40px;
+  margin-left: 25%;
+  margin-right: 25%;
 }
