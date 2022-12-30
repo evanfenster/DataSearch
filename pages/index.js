@@ -41,7 +41,7 @@ export default function Home() {
       headers += " | ";
 
       const replacedHeaders = headers.replaceAll(',', ";");
-      const replacedResult = result.replaceAll(',', ";");
+      const replacedResult = data.result.replaceAll(',', ";");
       const results = replacedHeaders.concat(replacedResult);
       const totalResults = results.split('|');
       totalResults[1] = totalResults[1].replace("\n", "");
