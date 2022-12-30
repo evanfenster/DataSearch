@@ -13,11 +13,12 @@ export default function Home() {
   async function onSubmit(event) {
     event.preventDefault();
     try {
+      // get some of the input values from the form 
       const inputElements = document.querySelectorAll('#att');
       const columns = Array.from(inputElements).map(inputElement => inputElement.value);
-
       const rows = document.getElementById("rows").value;
 
+      // create the API request from OpenAI
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
@@ -26,11 +27,13 @@ export default function Home() {
         body: JSON.stringify({ category: categoryInput, fields: columns, numRows: rows,}),
       });
 
+      // await the response and handle errors
       const data = await response.json();
       if (response.status !== 200) {
         throw data.error || new Error(`Request failed with status ${response.status}`);
       }
 
+      // update our result and categoryInput variables
       setResult(data.result);
       setcategoryInput("");
 
@@ -156,11 +159,9 @@ export default function Home() {
 
   // download the results as a CSV
   function downloadCSV() {
-
     // Create a CSV string
     var blob = new Blob(cleanedResult, {type: "text/plain;charset=utf-8"});
     FileSaver.saveAs(blob, "results.csv");
-      
   }
 
 
