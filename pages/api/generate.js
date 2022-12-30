@@ -17,6 +17,7 @@ export default async function (req, res) {
 
   const category = req.body.category || '';
   const attributes = req.body.fields;
+  const rows = req.body.numRows;
   if (category.trim().length === 0) {
     res.status(400).json({
       error: {
@@ -29,9 +30,9 @@ export default async function (req, res) {
   try {
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: generatePrompt(category, attributes),
+      prompt: generatePrompt(category, attributes, rows),
       temperature: 0,
-      max_tokens: 256 * 5,
+      max_tokens: 1000,
     });
     res.status(200).json({ result: completion.data.choices[0].text });
   } catch(error) {
@@ -51,8 +52,8 @@ export default async function (req, res) {
 }
 
 
-function generatePrompt(category, attributes) {
-  var prompt = `A string of the top ${category} and its `;
+function generatePrompt(category, attributes, rows) {
+  var prompt = `A string of the top ${rows} ${category} and its `;
   for (var i = 0; i < attributes.length - 1; i++) {
     const addition = "" + attributes[i] + ", ";
     prompt += addition;
@@ -66,18 +67,11 @@ function generatePrompt(category, attributes) {
   var format = "" + category + ' \\ ';
   for (var i = 0; i < attributes.length - 1; i++) {
     const addition = "" + attributes[i] + ` \\ `;
-    console.log("Current Format Addition: " + addition);
     format += addition;
   }
   format += attributes[attributes.length - 1] + " | ";
 
   prompt += format;
 
-  console.log("Prompt: " + prompt);
-
   return prompt;
-
-  // return `A string of the top ${category} and its ${attributes[0]}:
-  // Format:
-  // ${category} \\ ${attributes[0]} |`;
 }

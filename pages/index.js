@@ -8,6 +8,7 @@ export default function Home() {
 
   const [categoryInput, setcategoryInput] = useState("");
   const [result, setResult] = useState();
+  var cleanedResult = "";
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -15,12 +16,14 @@ export default function Home() {
       const inputElements = document.querySelectorAll('#att');
       const columns = Array.from(inputElements).map(inputElement => inputElement.value);
 
+      const rows = document.getElementById("rows").value;
+
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ category: categoryInput, fields: columns, }),
+        body: JSON.stringify({ category: categoryInput, fields: columns, numRows: rows,}),
       });
 
       const data = await response.json();
@@ -31,29 +34,64 @@ export default function Home() {
       setResult(data.result);
       setcategoryInput("");
 
+      // reset the attribute input fields and previous data
+      inputElements[0].value = "";
+      for (var j = 1; j < inputElements.length; j++) {
+        inputElements[j].remove();
+      }
+
+      const prevCsvBtn = document.getElementById("csvBtn");
+      if (prevCsvBtn) {
+        prevCsvBtn.remove();
+      }
+
+      const prevGrid = document.getElementById("grid");
+      prevGrid.innerHTML = "";
+
       // add code to put the data into arrays 
-      console.log("Results: \n" + result);
-      var headers = "" + categoryInput;
+      // create the headers based off the user inputs
+      // make the headers lowercase (and capitalize the first character)
+      var headers = "" + categoryInput.charAt(0).toUpperCase() + categoryInput.slice(1).toLowerCase();;
       for (var i = 0; i < columns.length; i++) {
-        const addition = " \\ " +  columns[i];
+        var next = "" + columns[i];
+        const addition = " \\ " +  next.charAt(0).toUpperCase() + next.slice(1).toLowerCase();
         headers += addition;
       }
       headers += " | ";
 
-      const replacedHeaders = headers.replaceAll(',', ";");
+      // parse into an array of arrays
       const replacedResult = data.result.replaceAll(',', ";");
-      const results = replacedHeaders.concat(replacedResult);
+      const results = headers.concat(replacedResult);
       const totalResults = results.split('|');
       totalResults[1] = totalResults[1].replace("\n", "");
-      console.log("Total Results: \n" + totalResults);
       
       const subResults = totalResults.map(element => element.split('\\'));
 
-      console.log(subResults);
+      // set as the result 
+      cleanedResult = subResults;
 
-      // Create a CSV string
-      var blob = new Blob(subResults, {type: "text/plain;charset=utf-8"});
-      FileSaver.saveAs(blob, "results.csv");
+      // create the grid preview to be displayed on-screen
+      const grid = document.getElementById('grid');
+
+      for (const row of subResults) {
+        const tr = document.createElement('tr');
+        for (const col of row) {
+          const td = document.createElement('td');
+          td.textContent = col;
+          tr.appendChild(td);
+        }
+        grid.appendChild(tr);
+      }
+
+      // create the button that allows the user to download as a CSV
+      const csvBtn = document.createElement('button');
+      csvBtn.textContent = 'Download CSV';
+      csvBtn.setAttribute("id", "csvBtn");
+      const main = document.getElementById("main");
+      main.appendChild(csvBtn);
+
+      // add an event listener 
+      csvBtn.addEventListener('click', downloadCSV);
 
     } catch(error) {
       // Consider implementing your own error handling logic here
@@ -69,7 +107,7 @@ export default function Home() {
         <link rel="icon" href="/data-icon.png" />
       </Head>
 
-      <main className={styles.main}>
+      <main className={styles.main} id="main">
         <img src="/data-icon.png" className={styles.icon} />
         <h3>DataSearch</h3>
         <form onSubmit={onSubmit} id="inputForm">
@@ -81,6 +119,12 @@ export default function Home() {
             onChange={(e) => setcategoryInput(e.target.value)}
           />
           <input
+            type="number"
+            name="rows"
+            placeholder="Number of desired rows"
+            id="rows"
+          />
+          <input
             type="text"
             name="attribute"
             placeholder="Enter an attribute for this category"
@@ -89,11 +133,13 @@ export default function Home() {
           <button id="addAttributeBtn" type="button" onClick={addInputField}>Add another attribute</button>
           <input type="submit" value="Search" />
         </form>
-        <div className={styles.result}>{result}</div>
+        <table id="grid">
+        </table>
       </main>
     </div>
   );
 
+  // add an extra attribute field
   function addInputField() {
     // Create a new input field
     var inputField = document.createElement("input");
@@ -106,6 +152,15 @@ export default function Home() {
     var form = document.getElementById("inputForm");
     var attBtn = document.getElementById("addAttributeBtn");
     form.insertBefore(inputField, attBtn);
+  }
+
+  // download the results as a CSV
+  function downloadCSV() {
+
+    // Create a CSV string
+    var blob = new Blob(cleanedResult, {type: "text/plain;charset=utf-8"});
+    FileSaver.saveAs(blob, "results.csv");
+      
   }
 
 
