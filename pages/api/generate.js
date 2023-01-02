@@ -54,6 +54,12 @@ export default async function (req, res) {
 
 
 function generatePrompt(category, attributes, rows) {
+  /* will create prompt like: 
+      "A string of the top 30 science fiction movies and its director, release year, and rating. 
+      Format:
+      science fiction movies \ director \ release year \ rating | "
+  */
+
   //set the first line of the prompt with the num of rows and category
   var prompt = `A string of the top ${rows} ${category} and its `;
   // add in each of the attributes
